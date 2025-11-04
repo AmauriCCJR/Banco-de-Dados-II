@@ -4,11 +4,11 @@ use olympicdata
 go
 
 
---CriaÁ„o de esquemas
+--Cria√ß√£o de esquemas
 create schema olympic
 go
 
---CriaÁ„o de Tabelas
+--Cria√ß√£o de Tabelas
 create table olympic.Paises (
 CodPais int identity(1,1),
 NomePais varchar(20) not null,
@@ -33,7 +33,7 @@ Idade int not null,
 CodPais int not null 
 )
 go
--- Tipo de competicao: Ver„o, inverno
+-- Tipo de competicao: Ver√£o, inverno
 create table olympic.Competicoes(
 CodCompeticao int identity(1,1),
 Ano int not null,
@@ -118,7 +118,7 @@ GO
 insert into olympic.Modalidades (NomeModalidade, Tipo, Categoria) values 
 ('Maratona','Individual','Corrida'),
 ('Tiro ao alvo','Coletivo','Pontaria'),
-('NataÁ„o','Individual','Corrida'),
+('Nata√ß√£o','Individual','Corrida'),
 ('Volei','Coletivo','Quadra'),
 ('Escalada','Coletivo','Corrida')
 GO
@@ -132,11 +132,11 @@ insert into olympic.Atletas (NomeAtleta, Sexo, Idade, CodPais) values
 go
 
 insert into olympic.Competicoes (Ano,CidadeSede,TipoCompeticao) values
-(0000,'Jerusalem','Ver„o AbenÁoado'),
+(0000,'Jerusalem','Ver√£o Aben√ßoado'),
 (2014 ,'Moskow','Inverno'),
-(2018 ,'Summoners Rift','Ver„o'),
+(2018 ,'Summoners Rift','Ver√£o'),
 (2022 ,'Madur Uro','Inverno'),
-(2026 ,'Ala hu akbar','Ver„o')
+(2026 ,'Ala hu akbar','Ver√£o')
 go
 
 insert into olympic.Resultados (CodAtleta, CodModalidade, CodCompeticao, Medalha, TempoEmMinutos, Pontuacao) values
@@ -150,13 +150,13 @@ go
 
 
 
--- Quest„o 1 --
+-- Quest√£o 1 --
 Select A.NomeAtleta, A.Sexo, A.Idade, P.NomePais
 from olympic.Atletas A inner join olympic.Paises P on A.CodPais = P.CodPais
 order by A.NomeAtleta asc
 go
 
--- Quest„o 2 --
+-- Quest√£o 2 --
 
 select a.NomeAtleta, m.NomeModalidade, r.Medalha, r.Pontuacao
 from olympic.Resultados r inner join olympic.Atletas a on r.CodAtleta = a.CodAtleta 
@@ -164,28 +164,28 @@ inner join olympic.Modalidades m on r.CodModalidade = m.CodModalidade
 go
 
 
--- Quest„o 3 --
+-- Quest√£o 3 --
 
 select c.Ano, c.CidadeSede, a.NomeAtleta, r.TempoEmMinutos
 from olympic.Competicoes c inner join olympic.Resultados r on c.CodCompeticao = r.CodCompeticao
 inner join olympic.Atletas a on r.CodAtleta = a.CodAtleta
 go
 
--- Quest„o 4 --
+-- Quest√£o 4 --
 select p.NomePais,count(r.Medalha) as 'Quantidade de medalhas' 
 from olympic.Atletas a inner join olympic.Resultados r on a.CodPais = r.CodAtleta
 inner join olympic.Paises p on p.CodPais = a.CodPais
 group by p.NomePais
 go
 
--- Quest„o 5 --
+-- Quest√£o 5 --
 select m.CodModalidade, m.NomeModalidade, c.TipoCompeticao, c.Ano
 from olympic.Resultados r inner join olympic.Competicoes c on r.CodCompeticao = c.CodCompeticao
 inner join olympic.Modalidades m on r.CodModalidade = m.CodModalidade
 order by m.CodModalidade asc
 go
 
--- Quest„o 6 --
+-- Quest√£o 6 --
 
 select p.NomePais, m.NomeModalidade
 from olympic.Atletas a inner join olympic.Paises p on p.CodPais = a.CodPais
@@ -219,12 +219,16 @@ go
 
 
 -- UnPivot --
-/*select * from
-(select a.NomeAtleta, r.Medalha from olympic.Atletas a inner join olympic.Resultados r 
-on a.CodAtleta = r.CodAtleta ) as P
-unpivot (Count(Case when Medalha = 'Ouro' then 1 end) as 'Ouro',
-		Count(Case when Medalha = 'Prata' then 1 end) as 'Prata',
-		Count(Case when Medalha = 'Bronze' then 1 end) as 'Bronze',)*/
+select unp.NomeAtleta, unp.Medalha, unp.Quantidade
+from (select NomeAtleta, 
+	count(case when Medalha = 'Ouro' then 1 end) as Ouro,
+	count(case when Medalha = 'Prata' then 1 end) as Prata,
+	count(case when Medalha = 'Bronze' then 1 end) as Bronze 
+	from olympic.Resultados R inner join olympic.Atletas A on R.CodAtleta = A.CodAtleta
+	group by NomeAtleta) as T
+Unpivot (Quantidade for Medalha in (Ouro, Prata, Bronze)) as unp
+go
+
 
 
 -- BackUp 1 -- 
@@ -276,3 +280,18 @@ medianame = 'HD de backup'
 go
 
 -- BckUp 7 --
+
+delete from olympic.Resultados
+go
+
+
+--BckUp 8 --
+restore database olympicdata
+from disk = 'C:\Backup\Amauri-e-Matheus\Backup-OLYMPICDATA-Simple-1.bak'
+with recovery,
+replace,
+stats = 10
+go
+
+
+
