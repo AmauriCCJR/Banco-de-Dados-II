@@ -17,9 +17,14 @@ go
 execute P_OlaMundoAm
 go
 
---Exec e execute n„o tem diferenÁa
+--Exec e execute n√£o tem diferen√ßa
 
--- Ler o cÛdigo
+/*
+Executa de maneira mais segura em ambiente de trabalho
+sp_executeSQL P_OlaMundoAm
+go
+*/
+-- Ler o c√≥digo
 sp_helptext 'P_OlaMundoAm'
 go
 
@@ -27,7 +32,7 @@ select OBJECT_DEFINITION(OBJECT_ID('P_OlaMundoAm'))
 go
 
 
---Alterando procedure e adicionando condiÁ„o
+--Alterando procedure e adicionando condi√ß√£o
 alter procedure P_OlaMundoAm @NomeUsuario varchar(20)
 as
 begin
@@ -46,7 +51,7 @@ go
 create procedure P_calculadoraAm (@valor1 int=1, @valor2 int=1, @operador char(1))
 as
 begin
-	set nocount on -- Desativando a contagem e apresentaÁ„o de linhas
+	set nocount on -- Desativando a contagem e apresenta√ß√£o de linhas
 	declare @resultado int
 	if (@valor1 <> 0 and @valor2 <> 0)
 	begin
@@ -59,7 +64,7 @@ begin
 		if @operador = '/'
 			set @resultado = @valor1 / @valor2
 		end
-		select CONCAT('O resultado obtido È: ', @resultado)
+		select CONCAT('O resultado obtido √©: ', @resultado)
 end
 go
 
@@ -113,3 +118,4 @@ go
 
 exec P_PesquisarDatas 1, '25-11-2025'
 go
+
